@@ -1,0 +1,31 @@
+# Web framework
+Flask==2.3.3
+Flask-RESTful==0.3.10
+Flask-SQLAlchemy==3.1.1
+Flask-Login==0.6.3
+Flask-WTF==1.2.1
+Flask-Migrate==4.0.5
+
+# Database
+SQLAlchemy==2.0.23
+psycopg2-binary==2.9.9  # For PostgreSQL
+
+# Web scraping and HTTP requests
+requests==2.31.0
+beautifulsoup4==4.12.2
+selenium==4.15.2
+webdriver-manager==4.0.1
+
+# Email validation
+dnspython==2.4.2
+email-validator==2.1.0.post1
+
+# Security
+python-dotenv==1.0.0
+bcrypt==4.0.1
+PyJWT==2.8.0
+
+# Utilities
+validators==0.22.0  # For URL validation
+tldextract==3.4.4   # For domain extraction
+python-whois==0.8.0 # For WHOIS lookups
