@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Server Error{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 text-center">
+        <div class="mt-5 mb-4">
+            <span class="display-1 text-danger">500</span>
+            <h1 class="display-4">Server Error</h1>
+            <p class="lead">Something went wrong on our end. We're working to fix it.</p>
+        </div>
+        
+        <img src="{{ url_for('static', filename='img/500.svg') }}" alt="500 Illustration" class="img-fluid mb-4" style="max-height: 300px;">
+        
+        <div class="mt-4">
+            <a href="{{ url_for('dashboard.index') }}" class="btn btn-primary btn-lg">
+                <i class="fas fa-home me-2"></i> Go to Dashboard
+            </a>
+            <a href="javascript:history.back()" class="btn btn-outline-secondary btn-lg ms-2">
+                <i class="fas fa-arrow-left me-2"></i> Go Back
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

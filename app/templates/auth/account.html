@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6">
+        <div class="card shadow mb-4">
+            <div class="card-header bg-primary text-white">
+                <h4 class="card-title mb-0">
+                    <i class="fas fa-user me-2"></i>
+                    Account Information
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">Username</label>
+                    <input type="text" class="form-control" value="{{ current_user.username }}" readonly>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-control" value="{{ current_user.email }}" readonly>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Account Created</label>
+                    <input type="text" class="form-control" value="{{ current_user.created_at.strftime('%Y-%m-%d') }}" readonly>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card shadow mb-4">
+            <div class="card-header bg-primary text-white">
+                <h4 class="card-title mb-0">
+                    <i class="fas fa-key me-2"></i>
+                    API Access
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">Your API Key</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" value="{{ current_user.api_key }}" id="apiKey" readonly>
+                        <button class="btn btn-outline-secondary" type="button" onclick="copyApiKey()">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                    <small class="form-text text-muted">
+                        Use this key to access our API endpoints. Keep it secure!
+                    </small>
+                </div>
+                
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Generating a new API key will invalidate the old one.
+                    </div>
+                    {{ form.generate(class="btn btn-danger") }}
+                </form>
+                
+                <hr>
+                
+                <h5>API Documentation</h5>
+                <p>Access the following endpoints using your API key:</p>
+                <ul>
+                    <li><code>/api/v1/status</code> - Check API status</li>
+                    <li><code>/api/v1/domain/search</code> - Find emails for a domain</li>
+                    <li><code>/api/v1/email/find</code> - Find a specific person's email</li>
+                    <li><code>/api/v1/email/verify</code> - Verify an email address</li>
+                </ul>
+                <p>Include your API key in the header: <code>X-API-Key: your_api_key</code></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function copyApiKey() {
+    var apiKeyInput = document.getElementById('apiKey');
+    apiKeyInput.select();
+    document.execCommand('copy');
+    
+    // Show a temporary tooltip
+    var btn = document.querySelector('.input-group button');
+    var originalHtml = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+    
+    setTimeout(function() {
+        btn.innerHTML = originalHtml;
+    }, 2000);
+}
+</script>
+{% endblock %}

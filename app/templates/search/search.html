@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <ul class="nav nav-tabs card-header-tabs" id="searchTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active text-dark" id="domain-tab" data-bs-toggle="tab" 
+                                data-bs-target="#domain-tab-pane" type="button" role="tab" 
+                                aria-controls="domain-tab-pane" aria-selected="true">
+                            <i class="fas fa-globe me-1"></i> Domain Search
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link text-dark" id="email-tab" data-bs-toggle="tab" 
+                                data-bs-target="#email-tab-pane" type="button" role="tab" 
+                                aria-controls="email-tab-pane" aria-selected="false">
+                            <i class="fas fa-user-tie me-1"></i> Email Finder
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-body">
+                <div class="tab-content" id="searchTabsContent">
+                    <!-- Domain Search Tab -->
+                    <div class="tab-pane fade show active" id="domain-tab-pane" role="tabpanel" 
+                         aria-labelledby="domain-tab" tabindex="0">
+                        <div class="row">
+                            <div class="col-md-8 offset-md-2">
+                                <h4 class="text-center mb-4">Find Email Addresses by Domain</h4>
+                                <form method="POST" action="{{ url_for('search.search') }}">
+                                    {{ domain_form.hidden_tag() }}
+                                    {{ domain_form.submit.id = "domain-submit" }}
+                                    
+                                    <div class="mb-4">
+                                        <label class="form-label">Enter a Domain:</label>
+                                        <div class="input-group">
+                                            {{ domain_form.domain(class="form-control form-control-lg", 
+                                                               placeholder="company.com") }}
+                                            {{ domain_form.submit(class="btn btn-primary btn-lg") }}
+                                        </div>
+                                        {% for error in domain_form.domain.errors %}
+                                            <div class="text-danger">{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                    
+                                    <div class="text-center text-muted">
+                                        <p class="mb-0">Examples: google.com, apple.com, microsoft.com</p>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Email Finder Tab -->
+                    <div class="tab-pane fade" id="email-tab-pane" role="tabpanel" 
+                         aria-labelledby="email-tab" tabindex="0">
+                        <div class="row">
+                            <div class="col-md-8 offset-md-2">
+                                <h4 class="text-center mb-4">Find Email Address of a Specific Person</h4>
+                                <form method="POST" action="{{ url_for('search.search') }}">
+                                    {{ email_form.hidden_tag() }}
+                                    {{ email_form.submit.id = "email-submit" }}
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">First Name:</label>
+                                            {{ email_form.first_name(class="form-control", placeholder="John") }}
+                                            {% for error in email_form.first_name.errors %}
+                                                <div class="text-danger">{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Last Name:</label>
+                                            {{ email_form.last_name(class="form-control", placeholder="Smith") }}
+                                            {% for error in email_form.last_name.errors %}
+                                                <div class="text-danger">{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label class="form-label">Domain:</label>
+                                        {{ email_form.domain(class="form-control", placeholder="company.com") }}
+                                        {% for error in email_form.domain.errors %}
+                                            <div class="text-danger">{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label class="form-label">Position (Optional):</label>
+                                        {{ email_form.position(class="form-control", placeholder="CEO") }}
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <label class="form-label">Email Pattern (Optional):</label>
+                                        {{ email_form.pattern(class="form-select") }}
+                                        <small class="form-text text-muted">
+                                            If you know the email pattern used by the company, select it here.
+                                            Otherwise, we'll try to detect it automatically.
+                                        </small>
+                                    </div>
+                                    
+                                    <div class="d-grid">
+                                        {{ email_form.submit(class="btn btn-primary btn-lg") }}
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card shadow">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">How It Works</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="text-center mb-3">
+                            <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                <span class="h4 mb-0">1</span>
+                            </div>
+                        </div>
+                        <h5 class="text-center">Enter Domain or Person</h5>
+                        <p class="text-center text-muted">
+                            Start by entering a company domain or a specific person's name and domain.
+                        </p>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center mb-3">
+                            <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                <span class="h4 mb-0">2</span>
+                            </div>
+                        </div>
+                        <h5 class="text-center">Advanced Search</h5>
+                        <p class="text-center text-muted">
+                            Our system uses multiple sources and algorithms to find and verify email addresses.
+                        </p>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center mb-3">
+                            <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                <span class="h4 mb-0">3</span>
+                            </div>
+                        </div>
+                        <h5 class="text-center">Get Results</h5>
+                        <p class="text-center text-muted">
+                            Receive verified email addresses with confidence scores and additional information.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Set initial active tab based on URL parameters
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('first_name') || urlParams.has('last_name')) {
+            const emailTab = document.getElementById('email-tab');
+            emailTab.click();
+        }
+    });
+</script>
+{% endblock %}

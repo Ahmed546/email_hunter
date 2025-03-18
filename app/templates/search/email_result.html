@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow mb-4">
+            <div class="card-header bg-primary text-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-envelope me-2"></i>
+                        Email Finder Result
+                    </h5>
+                    <a href="{{ url_for('search.search') }}" class="btn btn-sm btn-light">
+                        <i class="fas fa-search me-1"></i> New Search
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    <div class="display-1 text-{{ 'success' if email.is_verified else 'primary' }} mb-4">
+                        <i class="fas {{ 'fa-check-circle' if email.is_verified else 'fa-envelope' }}"></i>
+                    </div>
+                    <h3 class="email-address">{{ email.email_address }}</h3>
+                    
+                    {% if email.first_name or email.last_name %}
+                    <p class="text-muted mb-0">
+                        {{ email.first_name if email.first_name }} {{ email.last_name if email.last_name }}
+                        {% if email.position %}
+                        <span class="mx-2">|</span> {{ email.position }}
+                        {% endif %}
+                    </p>
+                    {% endif %}
+                    
+                    <div class="mt-3">
+                        {% if email.is_verified %}
+                        <span class="badge bg-success py-2 px-3 fs-6">Verified Email</span>
+                        {% else %}
+                        <span class="badge bg-secondary py-2 px-3 fs-6" id="verification-badge">Unverified</span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="row mt-4">
+                    <div class="col-md-6 offset-md-3">
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-primary btn-lg" id="copyButton">
+                                <i class="fas fa-copy me-2"></i> Copy Email Address
+                            </button>
+                            
+                            {% if not email.is_verified %}
+                            <button class="btn btn-outline-success" id="verifyButton" data-email-id="{{ email.id }}">
+                                <i class="fas fa-check-circle me-2"></i> Verify Email
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card shadow">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Email Details
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label text-muted">Domain</label>
+                            <div class="fs-5">
+                                <a href="{{ url_for('search.domain_results', domain=domain.domain_name) }}">
+                                    {{ domain.domain_name }}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label text-muted">Found On</label>
+                            <div class="fs-5">{{ email.created_at.strftime('%Y-%m-%d') }}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label text-muted">Confidence Score</label>
+                            <div>
+                                <div class="progress" style="height: 10px;">
+                                    <div class="progress-bar {% if email.confidence_score >= 0.7 %}bg-success{% elif email.confidence_score >= 0.5 %}bg-warning{% else %}bg-danger{% endif %}" 
+                                        role="progressbar" 
+                                        style="width: {% if email.confidence_score %}{{ (email.confidence_score * 100)|int }}{% else %}0{% endif %}%;"
+                                        aria-valuenow="{% if email.confidence_score %}{{ (email.confidence_score * 100)|int }}{% else %}0{% endif %}" 
+                                        aria-valuemin="0" 
+                                        aria-valuemax="100">
+                                    </div>
+                                </div>
+                                <small class="text-muted">{{ "%.0f"|format(email.confidence_score * 100) }}% confidence</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label text-muted">Verification Status</label>
+                            <div class="fs-5" id="verification-status">
+                                {% if email.is_verified %}
+                                <span class="text-success">
+                                    <i class="fas fa-check-circle me-1"></i> Verified
+                                </span>
+                                {% else %}
+                                <span class="text-secondary">
+                                    <i class="fas fa-times-circle me-1"></i> Not Verified
+                                </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <div class="alert alert-info">
+                    <h6 class="alert-heading"><i class="fas fa-lightbulb me-2"></i> Tips</h6>
+                    <ul class="mb-0">
+                        <li>Use this email address to contact the person directly.</li>
+                        <li>Consider verifying the email address before sending important messages.</li>
+                        <li>Check the confidence score to gauge the reliability of this email.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Copy email to clipboard
+    document.getElementById('copyButton').addEventListener('click', function() {
+        const email = document.querySelector('.email-address').textContent;
+        navigator.clipboard.writeText(email).then(() => {
+            // Show copied message
+            const originalText = this.innerHTML;
+            this.innerHTML = '<i class="fas fa-check me-2"></i> Copied!';
+            setTimeout(() => {
+                this.innerHTML = originalText;
+            }, 2000);
+        });
+    });
+    
+    // Verify email
+    const verifyButton = document.getElementById('verifyButton');
+    if (verifyButton) {
+        verifyButton.addEventListener('click', function() {
+            const emailId = this.getAttribute('data-email-id');
+            const verifyBtn = this;
+            
+            // Disable button and show loading state
+            verifyBtn.disabled = true;
+            verifyBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Verifying...';
+            
+            // Make AJAX request to verify
+            fetch(`/verify-email/${emailId}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Update UI based on result
+                    if (data.is_verified) {
+                        // Update badge
+                        const badge = document.getElementById('verification-badge');
+                        if (badge) {
+                            badge.classList.remove('bg-secondary');
+                            badge.classList.add('bg-success');
+                            badge.textContent = 'Verified Email';
+                        }
+                        
+                        // Update status
+                        const statusElement = document.getElementById('verification-status');
+                        if (statusElement) {
+                            statusElement.innerHTML = `
+                                <span class="text-success">
+                                    <i class="fas fa-check-circle me-1"></i> Verified
+                                </span>
+                            `;
+                        }
+                        
+                        // Remove verify button
+                        verifyBtn.remove();
+                    } else {
+                        // Reset button
+                        verifyBtn.disabled = false;
+                        verifyBtn.innerHTML = '<i class="fas fa-check-circle me-2"></i> Verify Email';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error verifying email:', error);
+                    
+                    // Reset button
+                    verifyBtn.disabled = false;
+                    verifyBtn.innerHTML = '<i class="fas fa-check-circle me-2"></i> Verify Email';
+                });
+        });
+    }
+</script>
+{% endblock %}

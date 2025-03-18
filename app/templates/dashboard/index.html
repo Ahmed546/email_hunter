@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <div class="card shadow">
+            <div class="card-body">
+                <h5 class="text-muted mb-3">Quick Search</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <form action="{{ url_for('search.search') }}" method="get">
+                            <div class="input-group mb-3">
+                                <input type="text" class="form-control form-control-lg" 
+                                       placeholder="Enter a domain name..." name="domain">
+                                <button class="btn btn-primary" type="submit">
+                                    <i class="fas fa-search"></i> Search
+                                </button>
+                            </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Statistics Cards -->
+    <div class="col-md-4 mb-4">
+        <div class="card shadow border-primary">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted">Total Searches</h6>
+                        <h2 class="mb-0">{{ search_count }}</h2>
+                    </div>
+                    <div class="icon-box bg-light-primary text-primary rounded p-3">
+                        <i class="fas fa-search fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card shadow border-success">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted">Emails Found</h6>
+                        <h2 class="mb-0">{{ email_count }}</h2>
+                    </div>
+                    <div class="icon-box bg-light-success text-success rounded p-3">
+                        <i class="fas fa-envelope fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card shadow border-info">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted">API Requests</h6>
+                        <h2 class="mb-0">{{ api_requests|default(0) }}</h2>
+                    </div>
+                    <div class="icon-box bg-light-info text-info rounded p-3">
+                        <i class="fas fa-code fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Recent Searches -->
+    <div class="col-md-12 mb-4">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Recent Searches</h5>
+                    <a href="{{ url_for('dashboard.search_history') }}" class="btn btn-sm btn-light">
+                        View All
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if recent_searches %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Query</th>
+                                <th>Type</th>
+                                <th>Results</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for search in recent_searches %}
+                            <tr>
+                                <td>{{ search.query }}</td>
+                                <td>
+                                    {% if search.search_type == 'domain' %}
+                                    <span class="badge bg-primary">Domain</span>
+                                    {% elif search.search_type == 'email' %}
+                                    <span class="badge bg-success">Email</span>
+                                    {% elif search.search_type == 'verify' %}
+                                    <span class="badge bg-info">Verify</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">{{ search.search_type }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ search.results_count }}</td>
+                                <td>{{ search.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                <td>
+                                    {% if search.search_type == 'domain' %}
+                                    <a href="{{ url_for('search.domain_results', domain=search.query) }}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    {% elif search.search_type == 'email' %}
+                                    <button class="btn btn-sm btn-outline-secondary" disabled>
+                                        <i class="fas fa-envelope"></i>
+                                    </button>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                    <p class="lead">No searches yet.</p>
+                    <a href="{{ url_for('search.search') }}" class="btn btn-primary">
+                        Start Searching
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+                        </form>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="text-end">
+                            <a href="{{ url_for('search.search') }}" class="btn btn-outline-primary">
+                                <i class="fas fa-user-tie me-1"></i> Find Person's Email
+                            </a>
+                            <a href="{{ url_for('search.search') }}" class="btn btn-outline-secondary ms-2">
+                                <i class="fas fa-check-circle me-1"></i> Verify Email
+                            </a>
+                        </div>
+                    </div>
